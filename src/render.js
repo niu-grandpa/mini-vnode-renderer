@@ -14,7 +14,6 @@ import { patch } from './index.js';
  */
 export function render(options) {
     const { components, el, beforeMount, mounted, created, beforeCreate } = options;
-
     const container = document.querySelector(el);
 
     if (!container) return;
@@ -22,14 +21,15 @@ export function render(options) {
     beforeCreate && beforeCreate();
 
     let elem = null;
-
     for (const name in components) {
         const component = components[name];
+
         created && created();
         beforeMount && beforeMount();
+
         elem = mount(component, container);
-        mounted && mounted();
     }
+    mounted && mounted();
 
     return {
         $el: elem,

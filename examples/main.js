@@ -1,12 +1,10 @@
 import { render } from '../src/index.js';
-import { Header, Content, Footer } from './components/index.js';
+import { Layout } from './layout/index.js';
 
 const App = render({
     el: '#app',
     components: {
-        Header,
-        Content,
-        Footer,
+        Layout,
     },
     beforeCreate: () => {
         console.log('beforeCreate!');
