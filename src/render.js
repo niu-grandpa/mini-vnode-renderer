@@ -1,5 +1,25 @@
-import { mount } from './index.js';
-import { patch } from './index.js';
+import { mount, patch } from './index.js';
+
+function _renderToDisplay(options) {
+    const { components, el, beforeMount, mounted, created, beforeCreate } = options;
+    const container = document.querySelector(el);
+
+    if (!container) return;
+
+    let elem = null;
+
+    beforeCreate && beforeCreate();
+
+    for (const name in components) {
+        const component = components[name];
+        created && created();
+        beforeMount && beforeMount();
+        elem = mount(component, container);
+    }
+
+    mounted && mounted();
+    return elem;
+}
 
 /**
  * 渲染虚拟 dom 到页面
@@ -13,25 +33,8 @@ import { patch } from './index.js';
  * }} options
  */
 export function render(options) {
-    const { components, el, beforeMount, mounted, created, beforeCreate } = options;
-    const container = document.querySelector(el);
-
-    if (!container) return;
-
-    beforeCreate && beforeCreate();
-
-    let elem = null;
-    for (const name in components) {
-        const component = components[name];
-
-        created && created();
-        beforeMount && beforeMount();
-
-        elem = mount(component, container);
-    }
-    mounted && mounted();
-
+    const instance = _renderToDisplay(options);
     return {
-        $el: elem,
+        $el: instance,
     };
 }

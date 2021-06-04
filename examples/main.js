@@ -6,6 +6,7 @@ const App = render({
     components: {
         Layout,
     },
+    // 生命周期
     beforeCreate: () => {
         console.log('beforeCreate!');
     },
@@ -19,3 +20,5 @@ const App = render({
         console.log('mounted!');
     },
 });
+
+console.log('渲染完毕后的实例元素:', App.$el);

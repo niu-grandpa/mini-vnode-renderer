@@ -10,6 +10,7 @@ function addProps(el, props) {
         }
     }
 }
+
 /**
  * @param {Node} el
  * @param {string | Array<string | object>} children

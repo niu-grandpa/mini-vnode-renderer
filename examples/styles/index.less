@@ -1,0 +1,42 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.layout {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+
+  &-header,
+  &-content,
+  &-footer {
+    width: 100%;
+    color: #fff;
+    text-align: center;
+  }
+
+  &-header,
+  &-footer {
+    background: #7cbce9;
+    flex: 0 0 auto;
+  }
+
+  &-header {
+    padding: 0 50px;
+    height: 64px;
+    line-height: 64px;
+  }
+
+  &-content {
+    flex: auto;
+    background: #0f8de9;
+    min-height: 250px;
+    line-height: 250px;
+  }
+
+  &-footer {
+    padding: 24px 50px;
+  }
+}
