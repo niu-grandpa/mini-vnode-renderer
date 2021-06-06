@@ -1,4 +1,4 @@
-import { mount, patch } from './index.js';
+import { mount } from './index.js';
 
 function _renderToDisplay(options) {
     const { components, el, beforeMount, mounted, created, beforeCreate } = options;
@@ -34,6 +34,7 @@ function _renderToDisplay(options) {
  */
 export function render(options) {
     const instance = _renderToDisplay(options);
+
     return {
         $el: instance,
     };

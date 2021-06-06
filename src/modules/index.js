@@ -1,4 +1,4 @@
-export { updateClass, updateAttrs, updateDataset, updateStyle }
+export { updateProps }
 from './props.js';
-export { updateNode, updateText }
+export { updateChildren }
 from './children.js';

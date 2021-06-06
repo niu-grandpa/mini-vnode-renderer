@@ -3,9 +3,10 @@
  * @param {object} props
  */
 function addProps(el, props) {
+    let key, value;
     if (props && typeof props === 'object') {
-        for (const key in props) {
-            const value = props[key];
+        for (key in props) {
+            value = props[key];
             el.setAttribute(key, value);
         }
     }
