@@ -37,12 +37,13 @@ function createChildren(el, children) {
 
 function createProps(el, data) {
     let key, value;
-    if (is.object(data)) {
-        for (key in data) {
-            value = data[key];
-            if (key === 'key') {
-                //
-            } else if (key.startsWith('on')) {
+    if (!is.object(data)) {
+        return;
+    }
+    for (key in data) {
+        value = data[key];
+        if (key !== 'key') {
+            if (key.startsWith('on')) {
                 createEventListener(el, key, value);
             } else {
                 createAttributes(el, key, value);
@@ -53,11 +54,8 @@ function createProps(el, data) {
 
 function createAttributes(el, key, value) {
     let name, _value;
-    if (key === 'id') {
-        el.id = value;
-    }
-    if (key === 'class') {
-        el.className = value;
+    if (key === 'id' || key === 'class') {
+        el.setAttribute(key, value);
     }
     if (key === 'style') {
         for (name in value) {
