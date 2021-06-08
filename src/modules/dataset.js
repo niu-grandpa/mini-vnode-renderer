@@ -21,14 +21,14 @@ export function updateDataset(oldVnode, vnode) {
         oldValue = oldDataset[key];
         if (value === oldValue) return;
         if (value !== oldValue) {
-            elem.dataset[key] = value;
+            elem.setAttribute(`data-${key}`, value);
         }
     }
 
     // 如果新对象的 key 不存在旧对象中则直接移除
     for (key in oldDataset) {
         if (!(key in newDataset)) {
-            elem.removeAttribute(key);
+            elem.removeAttribute(`data-${key}`);
         }
     }
 
