@@ -2,8 +2,7 @@
  * 更新元素 dataset 属性
  */
 export function updateDataset(oldVnode, vnode) {
-    const elem = vnode.elem;
-
+    const elem = (vnode.elem = oldVnode.elem);
     let newDataset = vnode.data.dataset,
         oldDataset = oldVnode.data.dataset;
 

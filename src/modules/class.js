@@ -4,7 +4,7 @@
  * 通过比较新旧节点类名的差异计算出需要更新的地方
  */
 export function updateClass(oldVnode, vnode) {
-    const elem = vnode.elem;
+    const elem = (vnode.elem = oldVnode.elem);
     const oldClass = oldVnode.data.class;
     const clazz = vnode.data.class;
 

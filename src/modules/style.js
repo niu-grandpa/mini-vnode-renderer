@@ -1,6 +1,5 @@
 export function updateStyle(oldVnode, vnode) {
-    const elem = vnode.elem;
-
+    const elem = (vnode.elem = oldVnode.elem);
     let oldStyle = oldVnode.data.style,
         newStyle = vnode.data.style,
         name = '',
