@@ -3,6 +3,4 @@
  * @param {object} oldVnode
  * @param {object} vnode
  */
-export function patch(oldVnode, vnode) {
-    updateProps(oldVnode, vnode);
-}
+export function patch(oldVnode, vnode) {}

@@ -2,7 +2,7 @@ import { createProps, createChildren } from './modules/index.js';
 
 /**
  * 渲染虚拟DOM并挂载到页面中
- * @param {object} vdom
+ * @param {{}} vdom
  * @param {HTMLElement} container
  * @returns {Node}
  */
