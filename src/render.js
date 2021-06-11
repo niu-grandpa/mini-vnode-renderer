@@ -6,10 +6,12 @@ import { createProps, createChildren } from './modules/index.js';
  * @param {HTMLElement} container
  * @returns {Node}
  */
-export function render(vdom, container) {
+export function render(vdom, container = undefined) {
     const elem = (vdom.elem = document.createElement(vdom.tag));
     createProps(elem, vdom);
     createChildren(elem, vdom.children, render);
-    container.appendChild(elem);
+    if (container) {
+        container.appendChild(elem);
+    }
     return elem;
 }
