@@ -1,4 +1,5 @@
 import * as is from './is.js';
+import { render } from '../render.js';
 
 /**
  * 创建子节点
@@ -7,7 +8,7 @@ import * as is from './is.js';
  * @param {Function} render
  * @returns
  */
-export function createChildren(el, children, render) {
+export function createChildren(el, children) {
     let i = 0,
         len = 0,
         vnode;
@@ -31,7 +32,7 @@ export function createChildren(el, children, render) {
     }
 }
 
-export function updateChildren(oldVnode, vnode, render) {
+export function updateChildren(oldVnode, vnode) {
     const elem = (vnode.elem = oldVnode.elem);
     let i = 0,
         commonLen = 0,
@@ -57,11 +58,11 @@ export function updateChildren(oldVnode, vnode, render) {
         // 新孩子为数组时，旧孩子为文本类型，则清空元素内容，挂载新节点
         if (is.primitive(oldCh)) {
             elem.innerHTML = '';
-            createChildren(elem, newCh, render);
+            createChildren(elem, newCh);
         } else if (is.array(oldCh)) {
             // 新旧孩子都为数组时，则对相同长度的部分重新比较
             commonLen = Math.min(oldCh.length, newCh.length);
-            for (i = 0; i <= commonLen; i++) updateChildren(oldCh[i], newCh[i], render);
+            for (i = 0; i <= commonLen; i++) updateChildren(oldCh[i], newCh[i]);
             // 新孩子长度如果大于旧孩子长度，则挂载那截长出来的部分
             if (oldCh.length < newCh.length) {
                 for (i = 0; i < newCh.slice(oldCh.length); i++) render(oldCh[i], elem);
