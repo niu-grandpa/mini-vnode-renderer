@@ -11,7 +11,7 @@ export default function render(oldVnode, vnode) {
     // 如果已经挂载过则再使用 render 只是进行两个 vnode 的比较和更新
     // 否则的话是执行首次挂载 vnode 到容器
     if (isMount) {
-        //
+        patchVnode(oldVnode, vnode);
     } else {
         elm = createElem(oldVnode);
     }
@@ -28,10 +28,18 @@ export default function render(oldVnode, vnode) {
     };
 }
 
+/**
+ * @param {object} vnode
+ * @returns {Element}
+ */
 function createElem(vnode) {
     //
 }
 
 function addVnodes(parent, vnode) {
+    //
+}
+
+function patchVnode(oldVnode, vnode) {
     //
 }
