@@ -46,10 +46,12 @@ function addVnodes(parent, vnode) {
             }
         } else if (is.primitive(children)) {
             elm = createNode(vnode, 'text');
+        } else {
+            elm = createNode(vnode, 'elm');
         }
     }
 
-    fragment.appendChild((elm = createNode(vnode, 'elm')));
+    fragment.appendChild(elm);
     parent.appendChild(fragment);
 }
 
@@ -59,17 +61,23 @@ function addVnodes(parent, vnode) {
  * @param {'elm' | 'text' | 'comment'} type 节点类型
  */
 function createNode(vnode, type) {
+    let elm;
     switch (type) {
         case 'elm':
-            document.createElement(vnode.tag, { is: vnode.data.is });
+            elm = document.createElement(vnode.tag, { is: vnode.data.is });
             break;
         case 'text':
-            document.createTextNode(vnode.tag);
+            elm = document.createTextNode(vnode.tag);
             break;
         case 'comment':
-            document.createComment(vnode.tag);
+            elm = document.createComment(vnode.tag);
             break;
     }
+    vnode.elm = elm;
+}
+
+function removeVnodes(vnode) {
+    vnode.parentElement.removeChild(vnode.elm);
 }
 
 function patchVnode(oldVnode, vnode) {
