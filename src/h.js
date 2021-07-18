@@ -1,5 +1,5 @@
 import vnode from './vnode.js';
-import is from './is.js';
+import * as is from './is.js';
 
 /**
  * 创建虚拟DOM节点
@@ -22,7 +22,7 @@ export default function h(tag, data, children) {
 
     if (children !== undefined) {
         if (is.primitive(children)) {
-            t = c;
+            t = children;
         } else if (is.array(children)) {
             c = children;
         }
