@@ -1,6 +1,6 @@
 import { h, render } from '../../src/index.js';
 
-const Header = h('main', {}, [
+const App = h('main', {}, [
     h(
         'header', {
             class: {
@@ -35,4 +35,4 @@ const Header = h('main', {}, [
     ),
 ]);
 
-render(Header).mount('#container');
+render(App).mount('#container');
