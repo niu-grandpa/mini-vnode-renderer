@@ -1,5 +1,6 @@
 import * as is from './is.js';
 
+const CAPS_REGEX = /[A-Z]/g;
 let isMounted = false;
 
 /**
@@ -14,7 +15,6 @@ export default function render(oldVnode, vnode) {
     if (isMounted) {
         patchVnode(oldVnode, vnode);
     }
-
     return {
         mount(sel) {
             if (isMounted) return;
@@ -28,10 +28,8 @@ export default function render(oldVnode, vnode) {
 }
 
 function addVnodes(parent, vnode) {
+    const { tag, data, children, text } = vnode;
     const fragment = document.createDocumentFragment();
-    const tag = vnode.tag;
-    const children = vnode.children;
-    const text = vnode.text;
 
     let i = 0,
         len,
@@ -45,11 +43,19 @@ function addVnodes(parent, vnode) {
         elm = createNode(vnode, 'comment');
     }
 
+    if (data !== undefined) {
+        addCIDAndClass(elm, data);
+        addStyle(elm, data);
+        addDataset(elm, data);
+        addAttributes(elm, data);
+        addEventListenrs(elm, vnode, data);
+    }
+
     if (children !== undefined) {
         if (is.array(children)) {
             len = children.length;
             for (; i < len; ++i) {
-                addVnodes(elm, vnode[i]);
+                addVnodes(elm, children[i]);
             }
         }
     }
@@ -60,7 +66,7 @@ function addVnodes(parent, vnode) {
         }
     }
 
-    fragment.appendChild(elm);
+    fragment.appendChild((vnode.elm = elm));
     parent.appendChild(fragment);
 }
 
@@ -77,14 +83,77 @@ function createNode(vnode, type) {
             elm = document.createElement(vnode.tag, { is: vnode.data.is });
             break;
         case 'text':
-            elm = document.createTextNode(vnode.tag);
+            elm = document.createTextNode(vnode.text);
             break;
         case 'comment':
             vnode.tag = '';
-            elm = document.createComment(vnode.text);
+            elm = document.createComment((vnode.text = ''));
             break;
     }
-    return (vnode.elm = elm);
+    return elm;
+}
+
+function addCIDAndClass(elm, data) {
+    const id = data.id;
+    const cn = data.class;
+    let name;
+    if (id) {
+        for (name in id) {
+            if (id[name] === true || id[name] === name) {
+                elm.setAttribute('id', name.replace(CAPS_REGEX, '-$&').toLowerCase());
+            }
+        }
+    }
+    if (cn) {
+        for (name in cn) {
+            if (cn[name] === true || cn[name] === name) {
+                elm.setAttribute('class', name.replace(CAPS_REGEX, '-$&').toLowerCase());
+            }
+        }
+    }
+}
+
+function addStyle(elm, data) {
+    const s = data.style;
+    let key;
+    if (!s) return;
+    for (key in s) elm.style[key] = s[key];
+}
+
+function addDataset(elm, data) {
+    const d = data.dataset;
+    let key;
+    if (!d) return;
+    for (key in d) {
+        elm.setAttribute(`data-${key.replace(CAPS_REGEX, '-$&').toLowerCase()}`, d[key]);
+    }
+}
+
+function addAttributes(elm, data) {
+    const attrs = data.attrs;
+    const o = ['class', 'id', 'style', 'dataset'];
+    let key;
+    if (!attrs) return;
+    for (key in attrs) {
+        if (!o.includes(key)) {
+            if (is.object(key)) {
+                addAttributes(elm, key);
+            } else {
+                elm.setAttribute(key, attrs[key]);
+            }
+        }
+    }
+}
+
+function addEventListenrs(elm, vnode, data) {
+    let key, type, listener;
+    for (key in data) {
+        if (key.startsWith('on')) {
+            type = key.slice(2).toLowerCase();
+            listener = data[key];
+            elm.addEventListener(type, ev => listener.call(vnode, ev, vnode), false);
+        }
+    }
 }
 
 function removeVnodes(vnode) {
