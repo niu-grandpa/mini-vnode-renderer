@@ -1,4 +1,5 @@
 import * as is from './is.js';
+import * as api from './htmldomapi.js';
 
 const CAPS_REGEX = /[A-Z]/g;
 let isMounted = false;
@@ -80,14 +81,13 @@ function createNode(vnode, type) {
     let elm;
     switch (type) {
         case 'elm':
-            elm = document.createElement(vnode.tag, { is: vnode.data.is });
+            elm = api.createElement(vnode.tag, { is: vnode.data.is });
             break;
         case 'text':
-            elm = document.createTextNode(vnode.text);
+            elm = api.createTextNode(vnode.text);
             break;
         case 'comment':
-            vnode.tag = '';
-            elm = document.createComment((vnode.text = ''));
+            elm = api.createComment(vnode.text ? vnode.text : '');
             break;
     }
     return elm;
