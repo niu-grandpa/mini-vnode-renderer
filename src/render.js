@@ -1,5 +1,5 @@
 import * as is from './is.js';
-import * as api from './htmldomapi.js';
+import { htmlDomApi as api } from './htmldomapi.js';
 
 const CAPS_REGEX = /[A-Z]/g;
 let isMounted = false;
@@ -63,12 +63,12 @@ function addVnodes(parent, vnode) {
 
     if (text !== undefined) {
         if (is.primitive(text)) {
-            elm.appendChild(createNode(vnode, 'text'));
+            api.appendChild(elm, createNode(vnode, 'text'));
         }
     }
 
-    fragment.appendChild((vnode.elm = elm));
-    parent.appendChild(fragment);
+    api.appendChild(fragment, (vnode.elm = elm));
+    api.appendChild(parent, fragment);
 }
 
 /**
@@ -139,7 +139,7 @@ function addAttributes(elm, data) {
             if (is.object(key)) {
                 addAttributes(elm, key);
             } else {
-                elm.setAttribute(key, attrs[key]);
+                elm.setAttribute(key, attrs[key] || '');
             }
         }
     }
@@ -157,7 +157,7 @@ function addEventListenrs(elm, vnode, data) {
 }
 
 function removeVnodes(vnode) {
-    vnode.parentElement.removeChild(vnode.elm);
+    api.removeChild(api.parentNode(vnode), vnode.elm);
 }
 
 function patchVnode(oldVnode, vnode) {

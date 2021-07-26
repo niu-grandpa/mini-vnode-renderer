@@ -1,6 +1,6 @@
 import { h, render } from '../../src/index.js';
 
-const App = h('main', {}, [
+const App = h('main', { class: { layout: true } }, [
     h(
         'header', {
             class: {
@@ -15,7 +15,7 @@ const App = h('main', {}, [
                 aside: true,
             },
         },
-        'This is an Header Component'
+        'This is an Sider Component'
     ),
     h(
         'section', {
