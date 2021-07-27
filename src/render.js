@@ -156,10 +156,22 @@ function addEventListenrs(elm, vnode, data) {
     }
 }
 
-function removeVnodes(vnode) {
+function removeVnode(vnode) {
     api.removeChild(api.parentNode(vnode), vnode.elm);
+}
+
+function updateChildren(parentElm, oldCh, newCh) {
+    //
 }
 
 function patchVnode(oldVnode, vnode) {
     //
+}
+
+function isSameVnode(vnode1, vnode2) {
+    const isSameTag = (vnode1.tag = vnode2.tag);
+    const isSamekey = vnode1.key === vnode2.key;
+    const isSameis = vnode1.is === vnode2.is;
+
+    return isSameTag && isSamekey && isSameis;
 }
