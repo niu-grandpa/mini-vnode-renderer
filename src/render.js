@@ -11,11 +11,10 @@ let isMounted = false;
  * @returns {{mount: (sel) => void}}
  */
 export default function render(oldVnode, vnode) {
-    // 如果已经挂载过则再使用 render 只是进行两个 vnode 的比较和更新
-    // 否则的话是执行首次挂载 vnode 到容器
-    if (isMounted) {
-        patchVnode(oldVnode, vnode);
-    }
+    // 判断vnode是否已经挂载到页面中
+    // 如果已经执行过mount方法挂载，那么后续在使用render则是用来进行vnode间的更新
+    if (isMounted) patchVnode(oldVnode, vnode);
+
     return {
         mount(sel) {
             if (isMounted) return;
@@ -28,69 +27,20 @@ export default function render(oldVnode, vnode) {
     };
 }
 
-function addVnodes(parent, vnode) {
+function createElm(vnode) {
     const { tag, data, children, text } = vnode;
-    const fragment = document.createDocumentFragment();
-
-    let i = 0,
-        len,
-        elm;
-
-    if (tag !== '!') {
-        elm = createNode(vnode, 'elm');
-    } else if (tag === '') {
-        elm = createNode(vnode, 'text');
+    if (tag === '!') {
+        vnode.elm = api.createComment(text || '');
     } else {
-        elm = createNode(vnode, 'comment');
+        vnode.elm = api.createElement(tag, { is: data.is });
     }
-
-    if (data !== undefined) {
-        addCIDAndClass(elm, data);
-        addStyle(elm, data);
-        addDataset(elm, data);
-        addAttributes(elm, data);
-        addEventListenrs(elm, vnode, data);
-    }
-
-    if (children !== undefined) {
-        if (is.array(children)) {
-            len = children.length;
-            for (; i < len; ++i) {
-                addVnodes(elm, children[i]);
-            }
-        }
-    }
-
-    if (text !== undefined) {
-        if (is.primitive(text)) {
-            api.appendChild(elm, createNode(vnode, 'text'));
-        }
-    }
-
-    api.appendChild(fragment, (vnode.elm = elm));
-    api.appendChild(parent, fragment);
+    return vnode.elm;
 }
 
-/**
- * 创建真实节点
- * @param {object} vnode
- * @param {'elm' | 'text' | 'comment'} type 节点类型
- * @returns {Element|Comment|Text}
- */
-function createNode(vnode, type) {
-    let elm;
-    switch (type) {
-        case 'elm':
-            elm = api.createElement(vnode.tag, { is: vnode.data.is });
-            break;
-        case 'text':
-            elm = api.createTextNode(vnode.text);
-            break;
-        case 'comment':
-            elm = api.createComment(vnode.text ? vnode.text : '');
-            break;
+function addVnodes(parentElm, vnodes, startIdx, endIdx) {
+    for (; startIdx <= endIdx; ++startIdx) {
+        //
     }
-    return elm;
 }
 
 function addCIDAndClass(elm, data) {
