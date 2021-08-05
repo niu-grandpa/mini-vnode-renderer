@@ -13,37 +13,76 @@ let isMounted = false;
 export default function render(oldVnode, vnode) {
     // 判断vnode是否已经挂载到页面中
     // 如果已经执行过mount方法挂载，那么后续在使用render则是用来进行vnode间的更新
-    if (isMounted) patchVnode(oldVnode, vnode);
+    if (isMounted) {
+        // 判断两个节点是否相同，不是的话则移除旧节点添加新节点
+        if (sameVnode(oldVnode, vnode)) {
+            patchVnode(oldVnode, vnode);
+        } else {
+            //
+        }
+    }
 
     return {
         mount(sel) {
             if (isMounted) return;
             else {
-                isMounted = true;
                 const container = document.querySelector(sel);
-                addVnodes(container, oldVnode);
+                api.appendChild(container, createElm(oldVnode));
+                isMounted = true;
             }
         },
     };
 }
 
+function sameVnode(vnode1, vnode2) {
+    const isSameTag = (vnode1.tag = vnode2.tag);
+    const isSamekey = vnode1.key === vnode2.key;
+    const isSameis = vnode1.is === vnode2.is;
+
+    return isSameTag && isSamekey && isSameis;
+}
+
 function createElm(vnode) {
-    const { tag, data, children, text } = vnode;
+    const { tag, data, children, text, elm } = vnode;
     if (tag === '!') {
-        vnode.elm = api.createComment(text || '');
+        elm = api.createComment(text || '');
+    } else if (tag !== undefined) {
+        elm = api.createElement(tag, { is: data.is });
+        // 处理孩子部分
+        if (is.array(children)) {
+            for (let i = 0; i < children.length; ++i) {
+                const ch = children[i];
+                if (ch != null) createElm(ch);
+            }
+        } else if (is.primitive(children)) {
+            api.appendChild(elm, api.createTextNode(children));
+        }
     } else {
-        vnode.elm = api.createElement(tag, { is: data.is });
+        // 创建文本节点：h(undefined, {}, [], 'text')
+        elm = api.createTextNode(text);
     }
-    return vnode.elm;
+    return (vnode.elm = elm);
 }
 
-function addVnodes(parentElm, vnodes, startIdx, endIdx) {
+function addVnodes(parentElm, before, vnodes, startIdx, endIdx) {
     for (; startIdx <= endIdx; ++startIdx) {
-        //
+        const ch = vnodes[startIdx];
+        if (ch != null) {
+            api.insertBefore(parentElm, createElm(ch), before);
+        }
     }
 }
 
-function addCIDAndClass(elm, data) {
+function removeVnode(parentElm, vnodes, startIdx, endIdx) {
+    for (; startIdx <= endIdx; ++startIdx) {
+        const ch = vnodes[startIdx];
+        if (ch != null) {
+            api.removeChild(parentElm, ch.elm);
+        }
+    }
+}
+
+function setIdClass(elm, data) {
     const id = data.id;
     const cn = data.class;
     let name;
@@ -63,14 +102,14 @@ function addCIDAndClass(elm, data) {
     }
 }
 
-function addStyle(elm, data) {
+function setStyle(elm, data) {
     const s = data.style;
     let key;
     if (!s) return;
     for (key in s) elm.style[key] = s[key];
 }
 
-function addDataset(elm, data) {
+function setDataSet(elm, data) {
     const d = data.dataset;
     let key;
     if (!d) return;
@@ -79,7 +118,7 @@ function addDataset(elm, data) {
     }
 }
 
-function addAttributes(elm, data) {
+function setAttributes(elm, data) {
     const attrs = data.attrs;
     const o = ['class', 'id', 'style', 'dataset'];
     let key;
@@ -87,7 +126,7 @@ function addAttributes(elm, data) {
     for (key in attrs) {
         if (!o.includes(key)) {
             if (is.object(key)) {
-                addAttributes(elm, key);
+                setAttributes(elm, key);
             } else {
                 elm.setAttribute(key, attrs[key] || '');
             }
@@ -106,10 +145,6 @@ function addEventListenrs(elm, vnode, data) {
     }
 }
 
-function removeVnode(vnode) {
-    api.removeChild(api.parentNode(vnode), vnode.elm);
-}
-
 function updateChildren(parentElm, oldCh, newCh) {
     //
 }
@@ -118,10 +153,20 @@ function patchVnode(oldVnode, vnode) {
     //
 }
 
-function isSameVnode(vnode1, vnode2) {
-    const isSameTag = (vnode1.tag = vnode2.tag);
-    const isSamekey = vnode1.key === vnode2.key;
-    const isSameis = vnode1.is === vnode2.is;
-
-    return isSameTag && isSamekey && isSameis;
+/**
+ * 创建索引表
+ * @param {object[]} children
+ * @param {number} beginIdx
+ * @param {number} endIdx
+ * @returns  {{[string]: number}}
+ */
+function createKeyToOldIdx(children, beginIdx, endIdx) {
+    const map = {};
+    for (let i = beginIdx; i < endIdx; ++i) {
+        const key = children[i].key;
+        if (key !== undefined) {
+            map[key] = i;
+        }
+    }
+    return map;
 }
