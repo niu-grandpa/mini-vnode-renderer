@@ -82,69 +82,6 @@ function removeVnode(parentElm, vnodes, startIdx, endIdx) {
     }
 }
 
-function setIdClass(elm, data) {
-    const id = data.id;
-    const cn = data.class;
-    let name;
-    if (id) {
-        for (name in id) {
-            if (id[name] === true || id[name] === name) {
-                elm.setAttribute('id', name.replace(CAPS_REGEX, '-$&').toLowerCase());
-            }
-        }
-    }
-    if (cn) {
-        for (name in cn) {
-            if (cn[name] === true || cn[name] === name) {
-                elm.setAttribute('class', name.replace(CAPS_REGEX, '-$&').toLowerCase());
-            }
-        }
-    }
-}
-
-function setStyle(elm, data) {
-    const s = data.style;
-    let key;
-    if (!s) return;
-    for (key in s) elm.style[key] = s[key];
-}
-
-function setDataSet(elm, data) {
-    const d = data.dataset;
-    let key;
-    if (!d) return;
-    for (key in d) {
-        elm.setAttribute(`data-${key.replace(CAPS_REGEX, '-$&').toLowerCase()}`, d[key]);
-    }
-}
-
-function setAttributes(elm, data) {
-    const attrs = data.attrs;
-    const o = ['class', 'id', 'style', 'dataset'];
-    let key;
-    if (!attrs) return;
-    for (key in attrs) {
-        if (!o.includes(key)) {
-            if (is.object(key)) {
-                setAttributes(elm, key);
-            } else {
-                elm.setAttribute(key, attrs[key] || '');
-            }
-        }
-    }
-}
-
-function addEventListenrs(elm, vnode, data) {
-    let key, type, listener;
-    for (key in data) {
-        if (key.startsWith('on')) {
-            type = key.slice(2).toLowerCase();
-            listener = data[key];
-            elm.addEventListener(type, ev => listener.call(vnode, ev, vnode), false);
-        }
-    }
-}
-
 function updateChildren(parentElm, oldCh, newCh) {
     //
 }
