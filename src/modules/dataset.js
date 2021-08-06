@@ -1,3 +1,5 @@
+const CAPS_REGEX = /[A-Z]/g;
+
 export function setDataSet(elm, data) {
     const d = data.dataset;
     let key;

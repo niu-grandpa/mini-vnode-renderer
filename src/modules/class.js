@@ -1,3 +1,5 @@
+const CAPS_REGEX = /[A-Z]/g;
+
 export function setIdAndClass(elm, data) {
     const id = data.id;
     const cn = data.class;
