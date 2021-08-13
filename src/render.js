@@ -3,8 +3,6 @@ import { htmlDomApi as api } from './htmldomapi.js';
 import toVnode from './tovnode.js';
 import update from './modules/index.js';
 
-let isMounted = false;
-
 /**
  * 渲染`vnode`并挂载到页面中
  * @param {object | Element} oldVnode
@@ -13,15 +11,9 @@ let isMounted = false;
  */
 export default function render(oldVnode, vnode) {
     let elm, parent;
-    // 判断vnode是否已经挂载到页面中
-    // 如果已经执行过mount方法挂载，那么后续在使用render则是用来进行vnode间的更新
-    if (isMounted) {
-        if (isUndef(vnode)) return;
 
-        if (!isVnode(oldVnode) && api.isElement(oldVnode)) {
-            oldVnode = toVnode(oldVnode);
-        }
-
+    if (isDef(vnode)) {
+        if (!isVnode(oldVnode) && api.isElement(oldVnode)) oldVnode = toVnode(oldVnode);
         // 如果新旧节点相同则只需要打补丁，否则移除旧节点挂载新节点
         if (sameVnode(oldVnode, vnode)) {
             patchVnode(oldVnode, vnode);
@@ -40,29 +32,14 @@ export default function render(oldVnode, vnode) {
 
     return {
         mount(sel) {
-            if (!isMounted) {
-                isMounted = true;
-                const container = document.querySelector(sel);
-                api.appendChild(container, createElm(oldVnode));
-            }
+            const container = document.querySelector(sel);
+            api.appendChild(container, createElm(oldVnode));
         },
     };
 }
 
-function isVnode(vnode) {
-    return vnode.tag === undefined;
-}
-
-function sameVnode(vnode1, vnode2) {
-    const isSameTag = (vnode1.tag = vnode2.tag);
-    const isSamekey = vnode1.key === vnode2.key;
-    const isSameis = vnode1.is === vnode2.is;
-
-    return isSameTag && isSamekey && isSameis;
-}
-
 function createElm(vnode) {
-    const { tag, data, children, text, elm } = vnode;
+    let { tag, data, children, text, elm } = vnode;
     if (tag === '!') {
         elm = api.createComment(text || '');
     } else if (isDef(tag)) {
@@ -71,7 +48,7 @@ function createElm(vnode) {
         if (is.array(children)) {
             for (let i = 0; i < children.length; ++i) {
                 const ch = children[i];
-                if (ch != null) createElm(ch);
+                if (ch != null) api.appendChild(elm, createElm(ch));
             }
         } else if (is.primitive(children)) {
             api.appendChild(elm, api.createTextNode(children));
@@ -114,7 +91,7 @@ function patchVnode(oldVnode, vnode) {
         update(oldVnode, vnode);
     }
 
-    if (isUndef(oldVnode.text)) {
+    if (isUndef(vnode.text)) {
         // 新旧节点都要孩子数组并且它们都不同则更新孩子节点
         if (isDef(oldCh) && isDef(ch)) {
             if (oldCh !== ch) updateChildren(oldCh, ch);
@@ -140,9 +117,7 @@ function patchVnode(oldVnode, vnode) {
     }
 }
 
-function updateChildren(parentElm, oldCh, newCh) {
-    //
-}
+function updateChildren(parentElm, oldCh, newCh) {}
 
 /**
  * 创建索引表
@@ -168,4 +143,16 @@ function isDef(s) {
 
 function isUndef(s) {
     return s === undefined;
+}
+
+function isVnode(vnode) {
+    return vnode.tag === undefined;
+}
+
+function sameVnode(vnode1, vnode2) {
+    const isSameTag = (vnode1.tag = vnode2.tag);
+    const isSamekey = vnode1.key === vnode2.key;
+    const isSameis = vnode1.is === vnode2.is;
+
+    return isSameTag && isSamekey && isSameis;
 }
