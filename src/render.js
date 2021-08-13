@@ -1,7 +1,7 @@
 import * as is from './is.js';
 import { htmlDomApi as api } from './htmldomapi.js';
 import toVnode from './tovnode.js';
-import update from './modules/index.js';
+import { setModules, updateModules } from './modules/index.js';
 
 /**
  * 渲染`vnode`并挂载到页面中
@@ -57,6 +57,9 @@ function createElm(vnode) {
         // 创建文本节点：h(undefined, {}, [], 'text')
         elm = api.createTextNode(text);
     }
+
+    setModules(elm, data);
+
     return (vnode.elm = elm);
 }
 
@@ -88,7 +91,7 @@ function patchVnode(oldVnode, vnode) {
 
     // 更新data
     if (isDef(vnode.data)) {
-        update(oldVnode, vnode);
+        updateModules(oldVnode, vnode);
     }
 
     if (isUndef(vnode.text)) {
