@@ -20,29 +20,53 @@ export function setIdAndClass(elm, data) {
     }
 }
 
-export function updateIdAndClass(oldVnode, vnode) {
-    let oldCls = oldVnode.data.class,
-        newCls = vnode.data.class,
-        elm = oldVnode.elm,
-        cur,
-        name;
+export function update(oldVnode, vnode) {
+    const elm = (vnode.elm = oldVnode.elm);
+    let klass = vnode.data.class;
+    let oldClass = oldVnode.data.class;
+    let id = vnode.data.id;
+    let oldId = oldVnode.data.id;
+    let name, cur, old;
 
-    if (!oldCls && !newCls) return;
-    if (oldCls === newCls) return;
+    if ((!oldClass && !klass) || (!oldId && !id)) return;
+    if (oldClass !== klass) {
+        klass = klass || {};
+        oldClass = oldClass || {};
+        for (name in klass) {
+            cur = klass[name];
+            old = oldClass[name];
+            if (cur !== old) {
+                elm.classList[cur ? 'add' : 'remove'](name);
+            }
+        }
 
-    oldCls = oldCls || {};
-    newCls = newCls || {};
-
-    for (name in oldCls) {
-        if (oldCls[name] && !Object.prototype.hasOwnProperty.call(newCls, name)) {
-            elm.classList.remove(name);
+        for (name in oldClass) {
+            if (oldClass[name] === true && !Object.prototype.hasOwnProperty.call(klass, name)) {
+                elm.classList.remove(name);
+            }
         }
     }
+    if (oldId !== id) {
+        id = id || {};
+        oldId = oldId || {};
+        for (name in id) {
+            cur = id[name];
+            old = oldId[name];
+            if (cur !== old) {
+                if (cur === true) {
+                    elm.id = elm.id + ` ${name}`;
+                } else if (cur === false) {
+                    elm.id = elm.id.split(name).join('');
+                } else {
+                    elm.id = elm.id + ` ${name}`;
+                }
+            }
+        }
 
-    for (name in newCls) {
-        cur = newCls[name];
-        if (cur !== oldCls[name]) {
-            elm.classList[cur ? 'add' : 'remove'](name);
+        for (name in oldId) {
+            if (oldId[name] === true && !Object.prototype.hasOwnProperty.call(id, name)) {
+                elm.id = elm.id.split(name).join('');
+            }
         }
     }
 }

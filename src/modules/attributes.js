@@ -13,3 +13,36 @@ export function setAttributes(elm, data) {
         }
     }
 }
+
+export function update(oldVnode, vnode) {
+    const elm = (vnode.elm = oldVnode.elm);
+    let attrs = vnode.data.attrs;
+    let oldAttrs = oldVnode.data.attrs;
+    let key, old, cur;
+
+    if (!attrs && !oldAttrs) return;
+    if (attrs === oldAttrs) return;
+
+    attrs = attrs || {};
+    oldAttrs = oldAttrs || {};
+
+    for (key in attrs) {
+        old = oldAttrs[key];
+        cur = attrs[key];
+        if (old !== cur) {
+            if (cur === true) {
+                elm.setAttribute(key, cur);
+            } else if (cur === false) {
+                elm.removeAttribute(key);
+            } else {
+                elm.setAttribute(key, cur);
+            }
+        }
+    }
+
+    for (key in oldAttrs) {
+        if (!(key in attrs)) {
+            elm.removeAttribute(key);
+        }
+    }
+}
