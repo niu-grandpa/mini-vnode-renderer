@@ -5,11 +5,11 @@ export function setStyle(elm, data) {
     for (key in s) elm.style[key] = s[key];
 }
 
-export function updateStyle(oldVnode, vnode) {
+export function update(oldVnode, vnode) {
     const elm = oldVnode.elm;
     let oldStyle = oldVnode.data.style;
     let curStyle = vnode.data.style;
-    let key, val;
+    let key, old, cur;
 
     if (!oldStyle && !curStyle) return;
     if (oldStyle === curStyle) return;
@@ -18,9 +18,18 @@ export function updateStyle(oldVnode, vnode) {
     curStyle = curStyle || {};
 
     for (key in curStyle) {
-        val = curStyle[key];
-        if (!key in oldStyle) {
-            elm.style[key] = val;
+        old = oldStyle[key];
+        cur = curStyle[key];
+        if (old !== cur) {
+            elm.style[key] = cur;
+        }
+    }
+
+    for (key in oldStyle) {
+        old = oldStyle[key];
+        cur = curStyle[key];
+        if (old && !Object.prototype.hasOwnProperty.call(curStyle, key)) {
+            elm.style[key] = '';
         }
     }
 }

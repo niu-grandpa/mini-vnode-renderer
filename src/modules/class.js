@@ -33,6 +33,7 @@ export function update(oldVnode, vnode) {
         klass = klass || {};
         oldClass = oldClass || {};
         for (name in klass) {
+            name = name.replace(CAPS_REGEX, '-$&').toLowerCase();
             cur = klass[name];
             old = oldClass[name];
             if (cur !== old) {
@@ -41,6 +42,7 @@ export function update(oldVnode, vnode) {
         }
 
         for (name in oldClass) {
+            name = name.replace(CAPS_REGEX, '-$&').toLowerCase();
             if (oldClass[name] === true && !Object.prototype.hasOwnProperty.call(klass, name)) {
                 elm.classList.remove(name);
             }
@@ -50,6 +52,7 @@ export function update(oldVnode, vnode) {
         id = id || {};
         oldId = oldId || {};
         for (name in id) {
+            name = name.replace(CAPS_REGEX, '-$&').toLowerCase();
             cur = id[name];
             old = oldId[name];
             if (cur !== old) {
@@ -64,6 +67,7 @@ export function update(oldVnode, vnode) {
         }
 
         for (name in oldId) {
+            name = name.replace(CAPS_REGEX, '-$&').toLowerCase();
             if (oldId[name] === true && !Object.prototype.hasOwnProperty.call(id, name)) {
                 elm.id = elm.id.split(name).join('');
             }
