@@ -13,6 +13,7 @@ export default function render(oldVnode, vnode) {
     let elm, parent;
 
     if (isDef(vnode)) {
+        // 如果旧节点是真实DOM则转换为虚拟的
         if (!isVnode(oldVnode) && api.isElement(oldVnode)) oldVnode = toVnode(oldVnode);
         // 如果新旧节点相同则只需要打补丁，否则移除旧节点挂载新节点
         if (sameVnode(oldVnode, vnode)) {
@@ -33,11 +34,17 @@ export default function render(oldVnode, vnode) {
     return {
         mount(sel) {
             const container = document.querySelector(sel);
-            api.appendChild(container, createElm(oldVnode));
+            const child = createElm(oldVnode);
+            api.appendChild(container, child);
         },
     };
 }
 
+/**
+ *
+ * @param {object} vnode
+ * @returns {Element}
+ */
 function createElm(vnode) {
     let { tag, data, children, text, elm } = vnode;
     if (tag === '!') {
@@ -120,7 +127,16 @@ function patchVnode(oldVnode, vnode) {
     }
 }
 
-function updateChildren(parentElm, oldCh, newCh) {}
+function updateChildren(parentElm, oldCh, newCh) {
+    let oldStartIdx = 0,
+        newStartIdx = 0,
+        oldEndIdx = oldCh.length - 1,
+        newEndIdx = newCh.length - 1,
+        oldStartVnode = oldCh[0],
+        newStartVnode = newCh[0],
+        oldEndVnode = oldCh[oldEndIdx],
+        newEndVnode = newCh[newEndIdx];
+}
 
 /**
  * 创建索引表
