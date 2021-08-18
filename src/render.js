@@ -102,7 +102,7 @@ function patchVnode(oldVnode, vnode) {
     }
 
     if (isUndef(vnode.text)) {
-        // 新旧节点都要孩子数组并且它们都不同则更新孩子节点
+        // 新旧节点都有孩子数组并且它们都不同则更新孩子节点
         if (isDef(oldCh) && isDef(ch)) {
             if (oldCh !== ch) updateChildren(oldCh, ch);
         } else if (isDef(ch)) {
@@ -135,7 +135,63 @@ function updateChildren(parentElm, oldCh, newCh) {
         oldStartVnode = oldCh[0],
         newStartVnode = newCh[0],
         oldEndVnode = oldCh[oldEndIdx],
-        newEndVnode = newCh[newEndIdx];
+        newEndVnode = newCh[newEndIdx],
+        oldKeyToIdx,
+        idxInOld,
+        elmToMove,
+        before;
+
+    // 循环条件：当旧结束指针大于或等于旧开始指针，并且新的指针也是如此
+    // 4个指针不断地向中间靠拢
+    while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
+        // 1.判断节点位置是否发生了移动，如果是则把对应指针向前或向右移动
+        if (oldStartVnode === null) {
+            oldStartVnode = oldCh[++oldStartIdx];
+        } else if (oldEndVnode === null) {
+            oldEndVnode = oldCh[--oldEndIdx];
+        } else if (newStartVnode === null) {
+            newStartVnode = newCh[++newStartIdx];
+        } else if (newEndVnode === null) {
+            newEndVnode = newCh[--newEndIdx];
+        }
+        // 2.以上四种情况不存在的话，则开始新旧节点首尾两两比较
+        else if (sameVnode(oldStartVnode, newStartVnode)) {
+            patchVnode(oldStartVnode, newStartVnode);
+            oldStartVnode = oldCh[++oldStartIdx];
+            newStartVnode = newCh[++newStartIdx];
+        } else if (sameVnode(oldEndVnode, newEndVnode)) {
+            patchVnode(oldEndVnode, newEndVnode);
+            oldEndVnode = oldCh[--oldEndIdx];
+            newEndVnode = newCh[--newEndIdx];
+        }
+        // 3.可能存在节点首尾位置交换，进行旧开始和新结束以及旧结束和新开始的比较
+        else if (sameVnode(oldStartVnode, newEndVnode)) {
+            // 节点向右移动了
+            patchVnode(oldStartVnode, newEndVnode);
+            // 首部的节点插入到最后一个节点之后
+            api.insertBefore(parentElm, oldStartVnode.elm, api.nextSibling(oldEndVnode.elm));
+            oldStartVnode = oldCh[++oldStartIdx];
+            newEndVnode = newCh[--newEndIdx];
+        } else if (sameVnode(oldEndVnode, newStartVnode)) {
+            // 节点向左移动了
+            patchVnode(oldEndVnode, newStartVnode);
+            // 尾部的节点插入到第一个节点前面
+            api.insertBefore(parentElm, oldEndVnode.elm, oldStartVnode.elm);
+            oldEndVnode = oldCh[--oldEndIdx];
+            newStartVnode = newCh[++newStartIdx];
+            // 如果vnode有设置key，则利用key精准的找到新旧两个节点变化前后的索引
+            // !可以跳过上面繁琐的对比，这也是为什么说设置key可以提高diff算法性能
+        } else {
+            // 获取旧vnode设置了key的节点的那个索引值
+            // 如果没有则新建一张索引表，对应key值
+            if (isUndef(oldKeyToIdx)) {
+                oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx);
+            }
+            // 获取新vnode的key值是否有在索引表中
+            idxInOld = oldKeyToIdx[newStartVnode.key];
+            if (isUndef(idxInOld)) {} else {}
+        }
+    }
 }
 
 /**
@@ -143,7 +199,7 @@ function updateChildren(parentElm, oldCh, newCh) {
  * @param {object[]} children
  * @param {number} beginIdx
  * @param {number} endIdx
- * @returns  {{[string]: number}}
+ * @returns  {{[key: string]: number}}
  */
 function createKeyToOldIdx(children, beginIdx, endIdx) {
     const map = {};
